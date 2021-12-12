@@ -11,6 +11,11 @@
 
 (set-face-attribute 'default nil :font "Fira Code Retina" :height 120)
 
+;; Needed if using emacsclient. Otherwise, your fonts will be smaller than expected.
+(add-to-list 'default-frame-alist '(font . "Fira Code Retina"))
+;; changes certain keywords to symbols, such as lamda!
+(setq global-prettify-symbols-mode t)
+
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -34,11 +39,11 @@
 
 
 (column-number-mode)
-(global-display-line-numbers-mode t)
+(global-display-line-numbers-mode 1)
+(global-visual-line-mode t)
 
 ;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
-                term-mode-hook
+(dolist (mode '(term-mode-hook
                 shell-mode-hook
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
@@ -75,8 +80,24 @@
 (rune/leader-keys
     "s" '(swiper :which-key "Swiper"))
 
+(use-package smex)
+(smex-initialize)
+
 (use-package which-key
-  :init (which-key-mode)
+  :init
+  (setq which-key-side-window-location 'bottom
+        which-key-sort-order #'which-key-key-order-alpha
+        which-key-sort-uppercase-first nil
+        which-key-add-column-padding 1
+        which-key-max-display-columns nil
+        which-key-min-display-lines 4
+        which-key-side-window-slot -10
+        which-key-side-window-max-height 0.25
+        which-key-idle-delay 0.8
+        which-key-max-description-length 25
+        which-key-allow-imprecise-window-fit t
+        which-key-separator " → " )
+  (which-key-mode)
   :diminish which-key-mode
   :config
   (setq which-key-idle-delay 1))
@@ -185,10 +206,33 @@
   :custom
   (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
 
+(rune/leader-keys
+  "g s" '(magit-status :which-key "Git Status"))
+
 ;; NOTE: Make sure to configure a GitHub token before using this package!
 ;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
 ;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
 (use-package forge)
+
+(winner-mode 1)
+(rune/leader-keys
+       ;; Window splits
+       "w k"   '(evil-window-delete :which-key "Kill window")
+       "w n"   '(evil-window-new :which-key "New window")
+       "w s"   '(evil-window-split :which-key "Horizontal split window")
+       "w v"   '(evil-window-vsplit :which-key "Vertical split window")
+       ;; Window motions
+       "w h"   '(evil-window-left :which-key "Window left")
+       "w j"   '(evil-window-down :which-key "Window down")
+       "w k"   '(evil-window-up :which-key "Window up")
+       "w l"   '(evil-window-right :which-key "Window right")
+       "w w"   '(evil-window-next :which-key "Goto next window")
+       ;; Winner mode
+       "w <left>"  '(winner-undo :which-key "Winner undo")
+       "w <right>" '(winner-redo :which-key "Winner redo"))
+
+(use-package smooth-scrolling)
+(smooth-scrolling-mode 1)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -196,7 +240,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(doom-themes forge evil-magit magit counsel-projectile projectile which-key use-package rainbow-delimiters key-chord ivy-rich hydra helpful gruber-darker-theme general evil-collection doom-modeline counsel)))
+   '(smooth-scrolling smex doom-themes forge evil-magit magit counsel-projectile projectile which-key use-package rainbow-delimiters key-chord ivy-rich hydra helpful gruber-darker-theme general evil-collection doom-modeline counsel)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
