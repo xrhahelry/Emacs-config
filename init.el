@@ -4,8 +4,10 @@
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
 (set-fringe-mode 10)        ; Give some breathing room
-
 (menu-bar-mode -1)            ; Disable the menu bar
+
+;; Set up the visible bell
+(setq visible-bell t)
 
 (set-face-attribute 'default nil :font "Fira Code Retina" :height 120)
 
@@ -33,7 +35,6 @@
 
 (column-number-mode)
 (global-display-line-numbers-mode t)
-(setq display-line-numbers 'relative)
 
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
@@ -50,11 +51,8 @@
     :global-prefix "C-SPC")
 
   (rune/leader-keys
-    "t"  '(:ignore t :which-key "Toggle")
-    "tt" '(counsel-load-theme :which-key "Choose Theme")
     ":" '(counsel-M-x :which-key "Command Pallete")
-    "." '(counsel-find-file :which-key "File Explorer")
-    "s" '(swiper :which-key "Swiper")))
+    "." '(counsel-find-file :which-key "File Explorer")))
 
 (use-package ivy
   :diminish
@@ -73,6 +71,9 @@
          ("C-d" . ivy-reverse-i-search-kill))
   :config
   (ivy-mode 1))
+
+(rune/leader-keys
+    "s" '(swiper :which-key "Swiper"))
 
 (use-package which-key
   :init (which-key-mode)
@@ -108,6 +109,12 @@
 
 (use-package gruber-darker-theme
   :init (load-theme 'gruber-darker t))
+
+(use-package doom-themes)
+
+(rune/leader-keys
+    "t"  '(:ignore t :which-key "Toggle")
+    "tt" '(counsel-load-theme :which-key "Choose Theme"))
 
 (use-package doom-modeline
   :ensure t
@@ -156,18 +163,43 @@
 (rune/leader-keys
   "ts" '(hydra-text-scale/body :which-key "scale text"))
 
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  ;; NOTE: Set this to the folder where you keep your Git repos!
+  (when (file-directory-p "~/Desktop/Projects")
+    (setq projectile-project-search-path '("~/Desktop/Projects")))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+(rune/leader-keys
+  "p" '(projectile-command-map :which-key "Projectile"))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+;; NOTE: Make sure to configure a GitHub token before using this package!
+;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
+(use-package forge)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ivy-mode t)
  '(package-selected-packages
-   '(hydra evil-collection evil rainbow-delimiters helpful counsel ivy-rich doom-modeline ivy use-package)))
+   '(doom-themes forge evil-magit magit counsel-projectile projectile which-key use-package rainbow-delimiters key-chord ivy-rich hydra helpful gruber-darker-theme general evil-collection doom-modeline counsel)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-
