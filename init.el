@@ -7,9 +7,6 @@
 
 (menu-bar-mode -1)            ; Disable the menu bar
 
-;; Set up the visible bell
-(setq visible-bell t)
-
 (set-face-attribute 'default nil :font "Fira Code Retina" :height 120)
 
 ;; Make ESC quit prompts
@@ -140,6 +137,13 @@
   :after evil
   :config
   (evil-collection-init))
+
+(use-package key-chord)
+(key-chord-mode 1)
+
+;;Exit insert mode by pressing j and then j quickly
+(setq key-chord-two-keys-delay 0.5)
+(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 
 (use-package hydra)
 
